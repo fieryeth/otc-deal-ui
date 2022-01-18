@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import { useEtherBalance, useEthers, useLookupAddress } from "@usedapp/core";
+import { Button } from "./components/Button";
 
 const shortenAddress = (address: string) => {
   return `${address.substring(0, 6)}...${address.substring(
@@ -21,12 +22,8 @@ function App() {
           <h1 className="text-white font-bold text-3xl">OTC Deal</h1>
         </div>
         <div className="flex border border-purple-300 w-full justify-evenly items-center bg-gray-900 rounded">
-          <p className="w-full py-2 hover:bg-gray-700 font-bold text-center rounded">
-            Create
-          </p>
-          <p className="w-full py-2 hover:bg-gray-700 font-bold text-center rounded">
-            Find
-          </p>
+          <Button text="Find" selected={true} />
+          <Button text="Create" selected={false} />
         </div>
         <div className="w-full text-center">
           {!account ? (
