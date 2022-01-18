@@ -1,0 +1,8 @@
+{
+  "short_name": "OTC Deal UI",
+  "name": "To create/find an OTC deal on an EVM-compatible chain.",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
