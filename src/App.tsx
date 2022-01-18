@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { useEtherBalance, useEthers, useLookupAddress } from "@usedapp/core";
 import { Button } from "./components/Button";
@@ -14,6 +14,12 @@ function App() {
   const { activateBrowserWallet, account, deactivate } = useEthers();
   const etherBalance = useEtherBalance(account);
   const ens = useLookupAddress();
+  const [tab, setTab] = useState({ find: true, create: false });
+
+  const handleClickTab = (newTab: string) => {
+    if (newTab === "find") setTab({ find: true, create: false });
+    if (newTab === "create") setTab({ find: false, create: true });
+  };
 
   return (
     <div className="App bg-black bg-gradient-to-b from-blue-800 h-screen text-white">
@@ -21,9 +27,17 @@ function App() {
         <div className="w-full text-center">
           <h1 className="text-white font-bold text-3xl">OTC Deal</h1>
         </div>
-        <div className="flex border border-purple-300 w-full justify-evenly items-center bg-gray-900 rounded">
-          <Button text="Find" selected={true} />
-          <Button text="Create" selected={false} />
+        <div className="flex w-full justify-evenly items-center bg-gray-900 rounded">
+          <Button
+            text="Find"
+            selected={tab["find"]}
+            onClick={() => handleClickTab("find")}
+          />
+          <Button
+            text="Create"
+            selected={tab["create"]}
+            onClick={() => handleClickTab("create")}
+          />
         </div>
         <div className="w-full text-center">
           {!account ? (
@@ -48,6 +62,29 @@ function App() {
         <p className="text-center text-3xl font-light mt-40">
           Please connect your Web3 account.
         </p>
+      )}
+
+      {account && (
+        <div className="w-3/5 m-auto mt-20 bg-gray-900 border border-purple-300 py-5 px-10">
+          <p className="text-center text-4xl">Find a Deal</p>
+          <p className="text-center text-xl">
+            Find an existing deal you're part of
+          </p>
+          <div className="flex flex-col w-4/5 m-auto mt-5">
+            <label
+              className="block text-white text-sm font-bold mb-2"
+              htmlFor="address"
+            >
+              Deal address
+            </label>
+            <input
+              className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="address"
+              type="text"
+              placeholder="0x..."
+            />
+          </div>
+        </div>
       )}
     </div>
   );
