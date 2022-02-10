@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "./App.css";
 import { useEtherBalance, useEthers, useLookupAddress } from "@usedapp/core";
+import {ethers} from "ethers";
 import { Button } from "./components/Button";
+import { DealInfo } from "./components/DealInfo";
 
 const shortenAddress = (address: string) => {
   return `${address.substring(0, 6)}...${address.substring(
@@ -11,10 +13,12 @@ const shortenAddress = (address: string) => {
 };
 
 function App() {
-  const { activateBrowserWallet, account, deactivate } = useEthers();
+  const { activateBrowserWallet, account, deactivate, chainId } = useEthers();
   const etherBalance = useEtherBalance(account);
   const ens = useLookupAddress();
   const [tab, setTab] = useState({ find: true, create: false });
+  const [address, setAddress] = useState("")
+
 
   const handleClickTab = (newTab: string) => {
     if (newTab === "find") setTab({ find: true, create: false });
@@ -82,8 +86,10 @@ function App() {
               id="address"
               type="text"
               placeholder="0x..."
+              onChange={(e) => setAddress(e.target.value)}
             />
           </div>
+          {ethers.utils.isAddress(address) && <DealInfo address={ethers.utils.getAddress(address)} chainId={chainId} />}
         </div>
       )}
     </div>
