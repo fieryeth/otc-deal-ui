@@ -4,26 +4,62 @@ import { useEtherBalance, useEthers, useLookupAddress } from "@usedapp/core";
 import {ethers} from "ethers";
 import { Button } from "./components/Button";
 import { DealInfo } from "./components/DealInfo";
+import Deal from "./abis/Deal.json"
 
 const shortenAddress = (address: string) => {
   return `${address.substring(0, 6)}...${address.substring(
-    address.length - 5,
-    address.length - 1
+    address.length - 4,
+    address.length
   )}`;
 };
 
 function App() {
-  const { activateBrowserWallet, account, deactivate, chainId } = useEthers();
+  const { activateBrowserWallet, account, deactivate, chainId, library } = useEthers();
   const etherBalance = useEtherBalance(account);
   const ens = useLookupAddress();
   const [tab, setTab] = useState({ find: true, create: false });
   const [address, setAddress] = useState("")
+  const [user0, setUser0] = useState("")
+  const [user1, setUser1] = useState("")
+  const [token0, setToken0] = useState("")
+  const [token1, setToken1] = useState("")
+  const [amount0, setAmount0] = useState("")
+  const [amount1, setAmount1] = useState("")
 
 
   const handleClickTab = (newTab: string) => {
     if (newTab === "find") setTab({ find: true, create: false });
     if (newTab === "create") setTab({ find: false, create: true });
   };
+
+  const handleDealDeployment = async () => {
+    console.log("Started deployment")
+    if (!library) {
+      return
+    }
+
+    const factory = new ethers.ContractFactory(
+      new ethers.utils.Interface(Deal.abi),
+      Deal.bytecode,
+      library.getSigner()
+    )
+
+    const dealContract = await factory.deploy(
+      user0,
+      user1,
+      token0,
+      token1,
+      parseInt(amount0),
+      parseInt(amount1)
+    )
+
+    console.log("Deploying Deal...")
+    console.log(`Address will be ${dealContract.address}`)
+
+    await dealContract.deployed()
+
+    console.log("Deployed")
+  }
 
   return (
     <div className="App bg-black bg-gradient-to-b from-blue-800 h-screen text-white">
@@ -70,26 +106,133 @@ function App() {
 
       {account && (
         <div className="w-3/5 m-auto mt-20 bg-gray-900 border border-purple-300 py-5 px-10">
-          <p className="text-center text-4xl">Find a Deal</p>
-          <p className="text-center text-xl">
-            Find an existing deal you're part of
-          </p>
-          <div className="flex flex-col w-4/5 m-auto mt-5">
-            <label
-              className="block text-white text-sm font-bold mb-2"
-              htmlFor="address"
-            >
-              Deal address
-            </label>
-            <input
-              className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="address"
-              type="text"
-              placeholder="0x..."
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-          {ethers.utils.isAddress(address) && <DealInfo address={ethers.utils.getAddress(address)} chainId={chainId} />}
+          {tab["find"] && <div>
+            <p className="text-center text-4xl">Find a Deal</p>
+            <p className="text-center text-xl">
+              Find an existing deal you're part of
+            </p>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                Deal address
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="address"
+                type="text"
+                placeholder="0x..."
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+            {ethers.utils.isAddress(address) && <DealInfo address={ethers.utils.getAddress(address)} chainId={chainId} />}
+          </div>}
+
+          {tab["create"] && <div>
+            <p className="text-center text-4xl">Create a Deal</p>
+            <p className="text-center text-xl">
+              Create a brand new deal
+            </p>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                User 1 (Address)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="user0"
+                type="text"
+                placeholder="0x..."
+                onChange={(e) => setUser0(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                User 2 (Address)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="user1"
+                type="text"
+                placeholder="0x..."
+                onChange={(e) => setUser1(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                Token 1 (Address of the token to be sent by User 1)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="token0"
+                type="text"
+                placeholder="0x..."
+                onChange={(e) => setToken0(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                Token 2 (Address of the token to be sent by User 2)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="token1"
+                type="text"
+                placeholder="0x..."
+                onChange={(e) => setToken1(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                Amount 1 (amount of Token 1 in the Deal)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="amount0"
+                type="text"
+                placeholder="100"
+                onChange={(e) => setAmount0(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col w-4/5 m-auto mt-5">
+              <label
+                className="block text-white text-sm font-bold mb-2"
+                htmlFor="address"
+              >
+                Amount 2 (amount of Token 2 in the Deal)
+              </label>
+              <input
+                className="shadow appearance-none rounded w-full m-auto py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="amount1"
+                type="text"
+                placeholder="200"
+                onChange={(e) => setAmount1(e.target.value)}
+              />
+            </div>
+
+            <div className="w-1/3 m-auto mt-8">
+              <Button
+                text="Create"
+                selected={false}
+                onClick={() => handleDealDeployment()}
+              />
+            </div>
+          </div>}
         </div>
       )}
     </div>
