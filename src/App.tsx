@@ -32,9 +32,15 @@ function App() {
     if (newTab === "create") setTab({ find: false, create: true });
   };
 
+  const checkAddresses = (addresses: string[]) => {
+    return addresses.map(addy => ethers.utils.isAddress(addy)).every((t) => t)
+  }
+
   const handleDealDeployment = async () => {
     console.log("Started deployment")
-    if (!library) {
+
+    if (!library || !checkAddresses([user0, user1, token0, token1])) {
+      console.log("Addresses not valid")
       return
     }
 
