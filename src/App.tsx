@@ -25,6 +25,28 @@ function App() {
   const [token1, setToken1] = useState("")
   const [amount0, setAmount0] = useState("")
   const [amount1, setAmount1] = useState("")
+  const chains = [
+      {
+        "id": 1,
+        "name": "Ethereum",
+        "node_url": "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+      },
+      {
+        "id": 31337,
+        "name": "Hardhat (Local)",
+        "node_url": "http://localhost:8545"
+      }
+    ]
+
+  const getChainName = (chainId: number) => {
+    for (const chain of chains) {
+      if (chainId == chain.id) {
+        return chain.name
+      }
+    }
+
+    return "Unknown Network"
+  }
 
 
   const handleClickTab = (newTab: string) => {
@@ -94,12 +116,20 @@ function App() {
               Connect Web3 Account
             </button>
           ) : (
-            <button
-              className="bg-gray-900 hover:bg-gray-700 text-white font-bold py-2 px-4 border border-purple-300 rounded"
-              onClick={() => deactivate()}
-            >
-              {ens ?? shortenAddress(account)}
-            </button>
+            <div>
+              {chainId && <button
+                className="bg-gray-900 hover:bg-gray-700 text-white font-bold py-2 px-4 border border-purple-300 rounded"
+                onClick={() => deactivate()}
+              >
+                {getChainName(chainId)}
+              </button>}
+              <button
+                className="bg-gray-900 hover:bg-gray-700 text-white font-bold py-2 px-4 border border-purple-300 rounded"
+                onClick={() => deactivate()}
+              >
+                {ens ?? shortenAddress(account)}
+              </button>
+            </div>
           )}
         </div>
       </header>
