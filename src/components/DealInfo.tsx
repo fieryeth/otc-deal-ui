@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useContractCall, ContractCall, ChainId } from "@usedapp/core";
+import { useContractCall, ContractCall, ChainId, useToken } from "@usedapp/core";
 import {BigNumber, ethers } from "ethers";
 import Deal from "../abis/Deal.json";
 import useDealInfo from "../hooks/useDealInfo";
@@ -11,9 +11,11 @@ interface IDealInfo {
 
 export const DealInfo = (props: IDealInfo) => {
   const [user0, user1, token0, token1, amount0, amount1] = useDealInfo(props.address)
+  const token0Info = useToken(token0)
+  const token1Info = useToken(token1)
   return (
     <div className="mt-24 text-xl">
-      {user0 ? (<div className="flex justify-between w-4/5 m-auto">
+      {user0 && token0Info && token1Info ? (<div className="flex justify-between w-4/5 m-auto">
         <div>
           <p>User 1</p>
           <p>User 2</p>
@@ -25,8 +27,8 @@ export const DealInfo = (props: IDealInfo) => {
         <div>
           <p>{user0}</p>
           <p>{user1}</p>
-          <p>{token0}</p>
-          <p>{token1}</p>
+          <p>{token0Info.name} ({token0})</p>
+          <p>{token1Info.name} ({token1})</p>
           <p>{amount0.toNumber()}</p>
           <p>{amount1.toNumber()}</p>
         </div>
